@@ -54,6 +54,7 @@ const getPublicPath = () => {
 
 module.exports = {
     moduleFileExtensions,
+    appRoot: resolveApp('.'),
     appSrc: resolveApp('src'),
     appSrcIndex: resolveModule('src/index'),
     appPublic: resolveApp('public'),

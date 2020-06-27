@@ -1,5 +1,5 @@
 'use strict';
-const path = require('./path');
+const paths = require('./paths');
 // 打包完成后，动态生成html文件，会自动引入打包生成的各项文件
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 // 每次打包的时候清理一次build文件夹下的文件
@@ -12,17 +12,17 @@ const isDevelopment = process.env.NODE_ENV = 'development';
 module.exports = {
     mode: isProdution ? 'production' : 'development',
     entry: {
-        main: path.appSrcIndex
+        main: paths.appSrcIndex
     },
     output: {
-        path: isProdution ? path.appBuild : undefined,
+        path: isProdution ? paths.appBuild : undefined,
         filename: '[name].[contenthash:8].js'
     },
     plugins: [
         new HtmlWebpackPlugin(
             Object.assign({}, {
                 // 模板文件为 public/index.html
-                template: path.appHtml
+                template: paths.appHtml
             }, isProdution ? {
                 // 当为开发模式时，启动html-minifier-terser压缩进行压缩，配置详细查看
                 // https://github.com/DanielRuf/html-minifier-terser
