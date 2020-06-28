@@ -6,17 +6,21 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 
-const isProdution = process.env.NODE_ENV = 'production';
-const isDevelopment = process.env.NODE_ENV = 'development';
+const isProdution = process.env.NODE_ENV === 'production';
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 module.exports = {
-    mode: isProdution ? 'production' : 'development',
+    mode: isProdution
+        ? 'production'
+        : isDevelopment && 'development',
     entry: {
         main: paths.appSrcIndex
     },
     output: {
         path: isProdution ? paths.appBuild : undefined,
-        filename: '[name].[contenthash:8].js'
+        filename: isProdution
+            ? '[name].[contenthash:8].js'
+            : isDevelopment && 'static/js/bundle.js'
     },
     plugins: [
         new HtmlWebpackPlugin(
@@ -39,7 +43,7 @@ module.exports = {
                     minifyJS: true, // 使用 terser 压缩<script>中的js代码
                     minifyURLs: true // 使用 relateurl 压缩url信息
                 }
-            }: undefined)
+            } : undefined)
         ),
         new CleanWebpackPlugin()
     ]

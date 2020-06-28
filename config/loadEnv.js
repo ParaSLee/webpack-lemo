@@ -7,3 +7,14 @@ if (!process.env.NODE_ENV) {
 
 // 自定义变量装载，会自动查找 ./.env
 require('dotenv').config();
+
+if (process.env.NODE_ENV === 'production') {
+    // 配置browserslist的环境
+    process.env.BROWSERSLIST_ENV = 'production';
+
+} else {
+    // 配置browserslist的环境
+    process.env.BROWSERSLIST_ENV = 'development';
+    // 开启devServer.disableHostCheck选项
+    process.env.CLOSE_DEVSERVER_HOST_CHECK = true;
+}

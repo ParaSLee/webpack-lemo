@@ -1,7 +1,6 @@
 'use strict';
 
 process.env.NODE_ENV = 'development';
-process.env.BROWSERSLIST_ENV = 'development'; // 配置browserslist的环境
 
 // 抛出没有捕捉到的错误
 process.on('unhandledRejection', err => {
@@ -17,6 +16,7 @@ const browserslist = require('browserslist'); // 用来校验是否配置了brow
 
 const paths = require('../config/paths');
 const webpackConf = require('../config/webpack.config');
+const webpackDevServerConf = require('../config/webpackDevServer.config');
 
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -42,6 +42,6 @@ const compiler = webpack(webpackConf);
     通过node来启动webpack-dev-server，而不是直接运行webpack-dev-server启动服务，使得这个过程更可控
 */ 
 // 将webpack-dev-server以module包的形式使用，能创建一个服务
-const devServer = new webpackDevServer(compiler, {/* devServer config */})
+const devServer = new webpackDevServer(compiler, webpackDevServerConf)
 // 通过监听服务能获取到服务的变化，从而得以反馈到页面上
-devServer.listen(/* port */);
+devServer.listen(DEFAULT_PORT);

@@ -1,7 +1,6 @@
 'use strict';
 
 process.env.NODE_ENV = 'production';
-process.env.BROWSERSLIST_ENV = 'production'; // 配置browserslist的环境
 
 // 抛出没有捕捉到的错误
 process.on('unhandledRejection', err => {
