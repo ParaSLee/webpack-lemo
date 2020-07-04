@@ -1,5 +1,5 @@
 {
-  "name": "webpack-pie",
+  "name": "webpack-lemo",
   "version": "1.0.0",
   "description": "self webpack-config",
   "main": "index.js",
@@ -12,6 +12,7 @@
     "build2": "set NODE_ENV=production && webpack --config ./config/webpack.config.js"
   },
   "dependencies": {
+    "address": "^1.1.2",
     "browserslist": "^4.12.2",
     "chalk": "^4.1.0",
     "clean-webpack-plugin": "3.0.0",
