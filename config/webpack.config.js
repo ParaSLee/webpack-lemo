@@ -1,4 +1,5 @@
 'use strict';
+const path = require('path');
 const paths = require('./paths');
 // 打包完成后，动态生成html文件，会自动引入打包生成的各项文件
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -13,14 +14,51 @@ module.exports = {
     mode: isProdution
         ? 'production'
         : isDevelopment && 'development',
+    // 打包时如果出错则中断
+    bail: isProdution,
+    devtool: isProdution
+        ? 'hidden-source-map'
+        : isDevelopment && 'cheap-module-source-map',
     entry: {
         main: paths.appSrcIndex
     },
     output: {
         path: isProdution ? paths.appBuild : undefined,
         filename: isProdution
-            ? '[name].[contenthash:8].js'
-            : isDevelopment && 'static/js/bundle.js'
+            ? 'static/js/[name].[contenthash:8].js'
+            : isDevelopment && 'static/js/[name].js',
+        // 未在entry中配置的内容，文件名会走chunkFilename，如使用[代码分割/动态引入]
+        chunkFilename: isProdution
+            ? 'static/js/[name].[contenthash:8].chunk.js'
+            : isDevelopment && 'static/js/[name].chunk.js',
+        sourceMapFilename: isProdution
+            ? 'static/js/[name].[contenthash:8].js.map'
+            : isDevelopment && 'static/js/[file].map',
+        publicPath: paths.publicPath,
+        // 处理异步加载的模块的crossorigin值，anonymous在出现跨域加载脚本时，不带上用户信息
+        crossOriginLoading: 'anonymous',
+        // 当开启sourcemap后，为了能在sources里找到相应的文件以及位置
+        devtoolModuleFilenameTemplate: isProdution
+            ? info =>
+                path
+                .relative(paths.appSrc, info.absoluteResourcePath)
+                .replace(/\\/g, '/')
+            : isDevelopment &&
+                (info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')),
+    },
+    resolve: {
+        // 告诉 webpack 解析模块时应该搜索的目录。默认值就是['node_modules']
+        // 写出来方便之后扩展
+        modules: ['node_modules'],
+        // 在引入模块时如果没添加后缀，默认查找extensions中的后缀，如：import App from '../app' => import App from '../app.js(.ts)'
+        extensions: paths.moduleFileExtensions
+            .map(ext => `.${ext}`)
+            // 如果没有用ts，就在进行后缀查找时，删除对.ts的查询
+            .filter(ext => paths.appTsConfig || !ext.includes('ts')),
+        alias: {
+            // 默认添加 @ 指向 src目录
+            '@': path.resolve(paths.appSrc)
+        }
     },
     plugins: [
         new HtmlWebpackPlugin(
@@ -46,5 +84,15 @@ module.exports = {
             } : undefined)
         ),
         new CleanWebpackPlugin()
-    ]
+    ],
+    // 性能提示，当bundle过大时给出信息
+    // todo：可以仿照react做自己的提示，ex. FileSizeReporter
+    performance: {
+        // 当生成的bundle过大时，作出警告提示
+        hints: 'warning',
+        // 入口文件最大 250000字节
+        maxEntrypointSize: 250000,
+        // 资源文件（非入口文件）最大 250000字节
+        maxAssetSize: 250000,
+    }
 }

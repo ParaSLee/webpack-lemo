@@ -20,14 +20,14 @@ module.exports = {
     // 如果 paths.appPublic 路径里的文件需要使用public信息,
     // 可以像这样使用，PUBLIC_URL === process.env.PUBLIC_URL
     // <link rel="icon" href="%PUBLIC_URL%/favicon.ico">
-    contentBasePublicPath: paths.publicUrl,
+    contentBasePublicPath: paths.publicPath,
     // 当contentBase路径里的文件发生更改时触发一次完整的页面重载
     watchContentBase: true,
     // 热更新重载
     // 但需要注意，webpack-dev-server只支持css更新热重载，js更新会刷新浏览器
     hot: true,
-    // 公共路径，开发模式默认为 '/' 
-    publicPath: paths.publicUrl,
+    // 公共路径，开发模式默认为 '/'
+    publicPath: paths.publicPath,
     // 服务启动后，除了启动信息，终端上不会输出其他信息，包括重构建信息、错误、警告等信息
     // 启动后需要自己捕获输出各种信息
     quiet: true,
@@ -38,16 +38,16 @@ module.exports = {
     // 当出现错误时把错误输出到浏览器上
     overlay: true,
     // 针对SPA的配置，因为单页应用的路由是前端路由，例如 www.xxx.com/pageA, /pageA 为前端路由，
-    // 为了避免直接访问 www.xxx.com/pageA 时绕开了 www.xxx.com(/index.html) 
+    // 为了避免直接访问 www.xxx.com/pageA 时绕开了 www.xxx.com(/index.html)
     // 结果导致访问后端路径出现404
-    // 配置 historyApiFallback (Webpack-dev-server 使用了 connect-history-api-fallback) 
+    // 配置 historyApiFallback (Webpack-dev-server 使用了 connect-history-api-fallback)
     // 能解决这个问题。
     // 书写本配置的本意不是为了使用vue\react，因此注释了这段配置作为保留
     // historyApiFallback: {
     //     // 忽视pathname中有.的情况，如 www.xxx.com/pageA/page.html
     //     // pathname为 /pageA/page.html，这种时候会保留访问
-    //     disableDotRule: true, 
-    //     // 直接访问 www.xxx.com/pageA 时，会打到 www.xxx.com/(index.html) 
+    //     disableDotRule: true,
+    //     // 直接访问 www.xxx.com/pageA 时，会打到 www.xxx.com/(index.html)
     //     index: '/',
     // },
     // 代理
@@ -90,7 +90,7 @@ module.exports = {
                 ' 代理到 ' + chalk.cyan(proxy)
             );
             console.log();
-            
+
             if (res.writeHead && !res.headersSent) {
               res.writeHead(500);
             }

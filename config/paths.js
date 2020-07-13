@@ -8,7 +8,7 @@ const path = require('path');
     Tip:
     运行package.json里的指令 npm run xxx 以执行 node xxx，因为package.json在根目录
     即使config里文件的路径变了，也可以保证 rootDirectory 一定指向根目录
-*/ 
+*/
 const rootDirectory = fs.realpathSync(process.cwd());
 
 // 相对路径转绝对路径方法
@@ -25,7 +25,7 @@ const moduleFileExtensions = [
     Tip:
     模块文件可能为js/ts/jsx/tsx等，如果由js变为了ts，则需要修改webpack配置文件
     通过动态查找的形式，能避免重复修改配置文件
-*/ 
+*/
 const resolveModule = (filePath) => {
     const extension = moduleFileExtensions.find(extension => 
         fs.existsSync(resolveApp(`${filePath}.${extension}`))
@@ -62,5 +62,6 @@ module.exports = {
     appBuild: resolveApp('build'),
     appPackageJson: resolveApp('package.json'),
     yarnLockFile: resolveApp('yarn.lock'),
-    publicUrl: getPublicPath()
+    appTsConfig: resolveApp('tsconfig.json'),
+    publicPath: getPublicPath()
 };

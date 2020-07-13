@@ -20,6 +20,7 @@
     "filesize": "^6.1.0",
     "gzip-size": "^5.1.1",
     "html-webpack-plugin": "4.3.0",
+    "lodash": "^4.17.19",
     "recursive-readdir": "^2.2.2",
     "strip-ansi": "^6.0.0",
     "webpack": "4.43.0",
