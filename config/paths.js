@@ -27,7 +27,7 @@ const moduleFileExtensions = [
     通过动态查找的形式，能避免重复修改配置文件
 */
 const resolveModule = (filePath) => {
-    const extension = moduleFileExtensions.find(extension => 
+    const extension = moduleFileExtensions.find(extension =>
         fs.existsSync(resolveApp(`${filePath}.${extension}`))
     );
 

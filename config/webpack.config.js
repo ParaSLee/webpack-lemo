@@ -6,7 +6,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 // 每次打包的时候清理一次build文件夹下的文件
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-
 const isProdution = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -59,6 +58,40 @@ module.exports = {
             // 默认添加 @ 指向 src目录
             '@': path.resolve(paths.appSrc)
         }
+    },
+    module: {
+        // 告诉webpack不必解析的内容，对于非模块化的库文件没必要进行解析，默认把jquery加上
+        noParse: /jquery/,
+        rules: [
+            // isDevelopment ? {
+            //     test: /\.(js|mjs|jsx|ts|tsx)$/,
+            //     enforce: 'pre',
+            //     use: [{
+            //         loader: 'eslint-loader'
+            //     }]
+            // } : {},
+            {
+                oneOf: [
+                    {
+                        test: /\.(bmp|jpe?g|gif|png|woff2?|eot|ttf|svg)/,
+                        loader: require.resolve('url-loader'),
+                        options: {
+                            limit: 1000,
+                            name: 'static/media/[name].[hash:8].[ext]',
+                        }
+                    },
+
+                    // 其他没有被匹配到的文件做兜底处理
+                    {
+                        loader: require.resolve('file-loader'),
+                        exclude: /\.(js|ts|html|json)$/,
+                        options: {
+                            name: 'static/media/[name].[hash:8].[ext]',
+                        },
+                    }
+                ]
+            }
+        ],
     },
     plugins: [
         new HtmlWebpackPlugin(

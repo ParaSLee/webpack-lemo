@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import imgsrc from './1.jpeg';
+
 // 入口文件
 document.body.innerHTML = '打包成功!！'
 
@@ -9,16 +11,8 @@ let c = {};
 
 console.log(_.isEmpty(c))
 
-// new Promise((resolve, reject) => {
-//     resolve('a');
-// }).then((res) => {
-//     console.log(res);
-//     return new Promise((resolve, reject) => {
-//         reject('b');
-//     })
-// }).then((a) => {
-//     console.log('ok');
-// }, (err) => {
-//     console.log('inerr');
-//     console.log(err);
-// });
+
+let img = new Image();
+img.src = imgsrc;
+console.log(img);
+document.body.appendChild(img);
