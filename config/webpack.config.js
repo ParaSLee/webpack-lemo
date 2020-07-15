@@ -5,9 +5,57 @@ const paths = require('./paths');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 // 每次打包的时候清理一次build文件夹下的文件
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const postcssNormalize = require('postcss-normalize');
 
 const isProdution = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
+
+const getStyleLoaders = (cssOption, otherProcessor) => {
+    let loaders = [
+        isDevelopment && require.resolve('style-loader'),
+        // 打包时输出成文件好做cdn存储
+        // todo： 增加对css文件的压缩 optimize-css-assets-webpack-plugin
+        isProdution && {
+            loader: MiniCssExtractPlugin.loader
+        },
+        {
+            loader: require.resolve('css-loader'),
+            options: cssOption
+        },
+        {
+            loader: require.resolve('postcss-loader'),
+            options: {
+                ident: 'postcss',
+                plugins: [
+                    require('postcss-flexbugs-fixes'),
+                    require('postcss-preset-env')({
+                        autoprefixer: {
+                            flexbox: 'no-2009',
+                        },
+                        stage: 3
+                    }),
+                    postcssNormalize()
+                ],
+                sourceMap: isProdution
+            },
+        }
+    ].filter(Boolean);
+
+    if (otherProcessor) {
+        if (typeof otherProcessor !== 'string') {
+            loaders.push(otherProcessor);
+        } else {
+            loaders.push({
+                loader: require.resolve(otherProcessor),
+                options: {
+                    sourceMap: isProdution
+                }
+            })
+        }
+    }
+    return loaders;
+}
 
 module.exports = {
     mode: isProdution
@@ -80,6 +128,22 @@ module.exports = {
                             name: 'static/media/[name].[hash:8].[ext]',
                         }
                     },
+                    {
+                        test: /\.css/,
+                        use: getStyleLoaders({
+                            importLoaders: 1,
+                            sourceMap: isProdution
+                        }),
+                        sideEffects: true
+                    },
+                    {
+                        test: /\.less/,
+                        use: getStyleLoaders({
+                            importLoaders: 2,
+                            sourceMap: isProdution
+                        }, 'less-loader'),
+                        sideEffects: true
+                    },
 
                     // 其他没有被匹配到的文件做兜底处理
                     {
@@ -94,6 +158,10 @@ module.exports = {
         ],
     },
     plugins: [
+        isProdution && new MiniCssExtractPlugin({
+            filename: 'static/css/[name].[contenthash:8].css',
+            chunkFilename: 'static/css/[name].[contenthash:8].chunk.css'
+        }),
         new HtmlWebpackPlugin(
             Object.assign({}, {
                 // 模板文件为 public/index.html
