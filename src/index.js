@@ -1,20 +1,17 @@
-import _ from 'lodash';
-import imgsrc from './1.jpeg';
-import './index.less'
+import index2 from './index2';
 
-// 入口文件
-document.body.innerHTML = '打包成功!！'
+console.log('index2: ' + index2);
 
-const a = 1
-// a = 2;
+const fn = () => {}
+new Promise(() => {
+    console.log('a')
+})
 
-let c = {};
+class Test {
+    constructor(name) {
+        this.name = name
+    };
+}
 
-console.log(_.isEmpty(c))
-
-
-let img = new Image();
-img.src = imgsrc;
-console.log(img);
-document.body.appendChild(img);
-
+let ab = new Test('ab');
+console.log(ab);

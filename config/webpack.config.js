@@ -8,8 +8,9 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const postcssNormalize = require('postcss-normalize');
 
-const isProdution = process.env.NODE_ENV === 'production';
+const isProdution = ['production', 'buildDebug'].includes(process.env.NODE_ENV);
 const isDevelopment = process.env.NODE_ENV === 'development';
+const isBuildDebug = process.env.NODE_ENV === 'buildDebug';
 
 const getStyleLoaders = (cssOption, otherProcessor) => {
     let loaders = [
@@ -59,7 +60,9 @@ const getStyleLoaders = (cssOption, otherProcessor) => {
 
 module.exports = {
     mode: isProdution
-        ? 'production'
+        ? isBuildDebug
+            ? 'development'
+            : 'production'
         : isDevelopment && 'development',
     // 打包时如果出错则中断
     bail: isProdution,
@@ -144,6 +147,19 @@ module.exports = {
                         }, 'less-loader'),
                         sideEffects: true
                     },
+                    {
+                        test: /\.(js|ts)/,
+                        exclude: /node_modules/,
+                        use: [{
+                            loader: require.resolve('babel-loader'),
+                            options: {
+                                // 开启打包缓存
+                                cacheDirectory: isBuildDebug ? false : true,
+                                // 是否压缩代码
+                                compact: isDevelopment,
+                            }
+                        }]
+                    },
 
                     // 其他没有被匹配到的文件做兜底处理
                     {
@@ -158,10 +174,10 @@ module.exports = {
         ],
     },
     plugins: [
-        isProdution && new MiniCssExtractPlugin({
+        isProdution ? new MiniCssExtractPlugin({
             filename: 'static/css/[name].[contenthash:8].css',
             chunkFilename: 'static/css/[name].[contenthash:8].chunk.css'
-        }),
+        }) : {},
         new HtmlWebpackPlugin(
             Object.assign({}, {
                 // 模板文件为 public/index.html

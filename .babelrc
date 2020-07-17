@@ -1,0 +1,25 @@
+{
+    "presets": [
+        [
+            "@babel/preset-env",
+            {
+                "useBuiltIns": "usage",
+                "corejs": 2
+            }
+        ]
+    ],
+    "plugins": [
+        [
+            // 某些es新功能在转换后，因比较复杂会添加helper方法，这个helper方法会直接插入到代码中
+            // 污染全局变量，且包含重复代码, @babel/runtime能把这些内容融合到一个模块中
+            // 通过引入的方式, 加入到代码中，同时提供沙盒环境，避免全局污染
+            "@babel/plugin-transform-runtime", {
+                // todo: 配置corejs后，包反而更大了，why？
+                // todo: react的配置中，关闭了corejs、helpers，why？
+                "corejs": false,
+                "helpers": false,
+                "regenerator": true
+            }
+        ]
+    ]
+}

@@ -8,7 +8,7 @@ if (!process.env.NODE_ENV) {
 // 自定义变量装载，会自动查找 ./.env
 require('dotenv').config();
 
-if (process.env.NODE_ENV === 'production') {
+if (['production', 'buildDebug'].includes(process.env.NODE_ENV)) {
     // 配置browserslist的环境
     process.env.BROWSERSLIST_ENV = 'production';
 
