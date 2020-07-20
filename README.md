@@ -17,7 +17,7 @@
 |----- ⬜ 增加与上一次打包结果的大小对比<br>
 |----- ⬜ 输出打包时间<br>
 |<br>
-│- ❌ 用 node 启动 webpack-dev-server 服务<br>
+│- ⭕️ 用 node 启动 webpack-dev-server 服务<br>
 |--- ✅ 完成 webpack-dev-server 配置<br>
 |--- ⭕️ 服务提示<br>
 |----- ✅ 中文化提示<br>
@@ -30,12 +30,18 @@
 |--- ✅ 处理css\less<br>
 |--- ✅ 处理js<br>
 |--- ⬜ 处理ts<br>
-|--- ⬜ 打包性能优化<br>
+|--- ⬜ eslint<br>
+|--- ✅ 打包性能优化<br>
+|----- ✅ js压缩<br>
+|----- ✅ css压缩<br>
+|----- ✅ tree-shaking<br>
+|----- ✅ 代码分割<br>
+|----- ✅ 分离mainfest<br>
 |<br>
 |- ⬜ 其他<br>
 |--- ⬜ 增加打包分析<br>
 |--- ⬜ 增加dllplugin配置<br>
-|--- ⬜ 编写loader处理模块文件名<br>
+|--- ⬜ 自定义loader：处理模块文件名<br>
 
 
 本来能跑 webpack-dev-server 的，后来加了一些配置后跑不起来了。。先把webpack配置写完，之后再修复这个问题.

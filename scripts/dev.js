@@ -31,7 +31,7 @@ const HOST = process.env.HOST || '0.0.0.0';
 /*
     Tip:
     对于babel、autoprefixer等兼容工具，配置browserslist能保证浏览器的适配，以及节省没必要的兼容代码
-*/ 
+*/
 // 对browserslist的检测和提示。
 const current = browserslist.loadConfig({ path: paths.appRoot });
 if (!current) {
@@ -46,7 +46,7 @@ const compiler = webpack(webpackConf);
 /*
     Tip:
     通过node来启动webpack-dev-server，而不是直接运行webpack-dev-server启动服务，使得这个过程更可控
-*/ 
+*/
 // 将webpack-dev-server以module包的形式使用，能创建一个服务
 const devServer = new webpackDevServer(compiler, webpackDevServerConf)
 // 通过监听服务能获取到服务的变化，从而得以反馈到页面上

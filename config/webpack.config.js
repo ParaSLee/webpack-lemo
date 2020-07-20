@@ -7,16 +7,19 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const postcssNormalize = require('postcss-normalize');
+const TerserPlugin = require('terser-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const safePostCssParser = require('postcss-safe-parser');
 
 const isProdution = ['production', 'buildDebug'].includes(process.env.NODE_ENV);
 const isDevelopment = process.env.NODE_ENV === 'development';
 const isBuildDebug = process.env.NODE_ENV === 'buildDebug';
+const shouldUseSourceMap = isProdution;
 
 const getStyleLoaders = (cssOption, otherProcessor) => {
     let loaders = [
         isDevelopment && require.resolve('style-loader'),
         // 打包时输出成文件好做cdn存储
-        // todo： 增加对css文件的压缩 optimize-css-assets-webpack-plugin
         isProdution && {
             loader: MiniCssExtractPlugin.loader
         },
@@ -38,7 +41,7 @@ const getStyleLoaders = (cssOption, otherProcessor) => {
                     }),
                     postcssNormalize()
                 ],
-                sourceMap: isProdution
+                sourceMap: shouldUseSourceMap
             },
         }
     ].filter(Boolean);
@@ -50,7 +53,7 @@ const getStyleLoaders = (cssOption, otherProcessor) => {
             loaders.push({
                 loader: require.resolve(otherProcessor),
                 options: {
-                    sourceMap: isProdution
+                    sourceMap: shouldUseSourceMap
                 }
             })
         }
@@ -91,10 +94,93 @@ module.exports = {
         devtoolModuleFilenameTemplate: isProdution
             ? info =>
                 path
-                .relative(paths.appSrc, info.absoluteResourcePath)
-                .replace(/\\/g, '/')
+                    .relative(paths.appSrc, info.absoluteResourcePath)
+                    .replace(/\\/g, '/')
             : isDevelopment &&
-                (info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')),
+            (info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')),
+    },
+    optimization: {
+        // 启动压缩工具
+        minimize: isBuildDebug ? false : true,
+        // 自定义压缩工具及配置
+        minimizer: [
+            new TerserPlugin({
+                terserOptions: {
+                    parse: {
+                        ecma: 8,
+                    },
+                    compress: {
+                        ecma: 5,
+                        warnings: false,
+                        comparisons: false,
+                        inline: 2,
+                    },
+                    mangle: {
+                        // 开启解决safari10循环迭代器的bug
+                        safari10: true,
+                    },
+                    output: {
+                        ecma: 5,
+                        // 忽略注释
+                        comments: false,
+                        // 开启 字符串和正则表达式中的unicode字符转码
+                        ascii_only: true,
+                    },
+                },
+                sourceMap: shouldUseSourceMap,
+            }),
+            new OptimizeCSSAssetsPlugin({
+                cssProcessorOptions: {
+                    parser: safePostCssParser,
+                    map: shouldUseSourceMap
+                        ? {
+                            // 强制输出map到独立文件
+                            inline: false,
+                            // 开启后能将sourceMappingURL追加到css文件
+                            // 帮助浏览器查找map映射
+                            annotation: true,
+                        }
+                        : false,
+                },
+                cssProcessorPluginOptions: {
+                    preset: [
+                        'default',
+                        {
+                            minifyFontValues: {
+                                removeQuotes: false
+                            }
+                        }
+                    ],
+                },
+            }),
+        ],
+        // 开启tree-shaking标记
+        usedExports: true,
+        // 切片处理
+        splitChunks: {
+            chunks: 'all',
+            name: false,
+            minSize: 30000,
+            cacheGroups: {
+                base: {
+                    name: 'base',
+                    test: /[\\/]static[\\/]/,
+                    enforce: true,
+                },
+                dependence: { // 将第三方模块提取出来
+                    test: /node_modules/,
+                    chunks: 'initial',
+                    name: 'dependence',
+                    enforce: true
+                }
+            }
+        },
+        // 入口文件和chunk文件之间存在关联关系，这部分被写在mainfest中。
+        // mainfest的内容一般写在入口文件里
+        // 配置 runtimeChunk 将 mainfest 提取到 runtime 文件里
+        runtimeChunk: {
+            name: entrypoint => `runtime-${entrypoint.name}`
+        }
     },
     resolve: {
         // 告诉 webpack 解析模块时应该搜索的目录。默认值就是['node_modules']
@@ -135,7 +221,7 @@ module.exports = {
                         test: /\.css/,
                         use: getStyleLoaders({
                             importLoaders: 1,
-                            sourceMap: isProdution
+                            sourceMap: shouldUseSourceMap
                         }),
                         sideEffects: true
                     },
@@ -143,7 +229,7 @@ module.exports = {
                         test: /\.less/,
                         use: getStyleLoaders({
                             importLoaders: 2,
-                            sourceMap: isProdution
+                            sourceMap: shouldUseSourceMap
                         }, 'less-loader'),
                         sideEffects: true
                     },
@@ -153,7 +239,7 @@ module.exports = {
                         use: [{
                             loader: require.resolve('babel-loader'),
                             options: {
-                                // 开启打包缓存
+                                // 开启编译缓存
                                 cacheDirectory: isBuildDebug ? false : true,
                                 // 是否压缩代码
                                 compact: isDevelopment,
@@ -174,10 +260,10 @@ module.exports = {
         ],
     },
     plugins: [
-        isProdution ? new MiniCssExtractPlugin({
+        isProdution && new MiniCssExtractPlugin({
             filename: 'static/css/[name].[contenthash:8].css',
             chunkFilename: 'static/css/[name].[contenthash:8].chunk.css'
-        }) : {},
+        }),
         new HtmlWebpackPlugin(
             Object.assign({}, {
                 // 模板文件为 public/index.html
@@ -201,7 +287,7 @@ module.exports = {
             } : undefined)
         ),
         new CleanWebpackPlugin()
-    ],
+    ].filter(Boolean),
     // 性能提示，当bundle过大时给出信息
     // todo：可以仿照react做自己的提示，ex. FileSizeReporter
     performance: {

@@ -1,17 +1,11 @@
-import index2 from './index2';
+// import {add} from './index2';
 
-console.log('index2: ' + index2);
+// console.log(add(1,2));
 
-const fn = () => {}
-new Promise(() => {
-    console.log('a')
+import('./index2').then((res) => {
+    console.log(res);
 })
 
-class Test {
-    constructor(name) {
-        this.name = name
-    };
-}
-
-let ab = new Test('ab');
-console.log(ab);
+import('./index3').then((res) => {
+    console.log(res);
+})

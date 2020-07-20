@@ -23,7 +23,7 @@ const WARN_CHUNK_GZIP_SIZE = 1024 * 1024; // 打包后chunk文件大于1m提示�
 /*
     Tip:
     对于babel、autoprefixer等兼容工具，配置browserslist能保证浏览器的适配，以及节省没必要的兼容代码
-*/ 
+*/
 // 对browserslist的检测和提示。
 const current = browserslist.loadConfig({ path: paths.appRoot });
 if (!current) {
@@ -32,7 +32,7 @@ if (!current) {
 }
 
 new Promise((resolve) => {
-    resolve(FileSizeReporter.measureFileSizesBeforeBuild(paths.appBuild));  
+    resolve(FileSizeReporter.measureFileSizesBeforeBuild(paths.appBuild));
 }).then(previousFileSizes => {
     console.log('开始构建应用程序...\n');
 
@@ -42,7 +42,7 @@ new Promise((resolve) => {
     /*
         Tip:
         通过node来运行webpack打包，而不是直接运行webpack进行打包，使得这个过程更可控
-    */ 
+    */
     // 调用compiler.run调用一次webpack的打包服务，可以在里面处理打包结果
     compiler.run((err, stats) => {
         if (err) {
@@ -56,12 +56,14 @@ new Promise((resolve) => {
         const webpackMsg = stats.toJson({ all: false, warnings: true, errors: true });
 
         if (webpackMsg.errors.length > 0) {
-            new Error(messages.errors.join('\n\n'));
+            console.error(webpackMsg.errors.join('\n\n'));
+            console.log();
             console.log(chalk.bgRed('构建失败.\n'));
+            return ;
         }
-
-        if (webpackMsg.errors.length > 0) {
-            console.warn(messages.warnings.join('\n\n'));
+        if (webpackMsg.warnings.length > 0) {
+            console.warn(webpackMsg.warnings.join('\n\n'));
+            console.log();
             console.log(chalk.bgYellow('构建出现警告.\n'));
         } else {
             console.log(chalk.green('构建完成.\n'));

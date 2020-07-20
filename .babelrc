@@ -1,25 +1,25 @@
 {
     "presets": [
         [
+            // 通过preset-env编译后的代码会注入到全局，一般用在业务项目
+            // 注意：不建议与@babel/plugin-transform-runtime一起使用
             "@babel/preset-env",
             {
                 "useBuiltIns": "usage",
-                "corejs": 2
+                "corejs": 3,
+                // 不把模块转换成commonjs，
+                "modules": false
             }
         ]
     ],
     "plugins": [
-        [
-            // 某些es新功能在转换后，因比较复杂会添加helper方法，这个helper方法会直接插入到代码中
-            // 污染全局变量，且包含重复代码, @babel/runtime能把这些内容融合到一个模块中
-            // 通过引入的方式, 加入到代码中，同时提供沙盒环境，避免全局污染
-            "@babel/plugin-transform-runtime", {
-                // todo: 配置corejs后，包反而更大了，why？
-                // todo: react的配置中，关闭了corejs、helpers，why？
-                "corejs": false,
-                "helpers": false,
-                "regenerator": true
-            }
-        ]
+        // [
+        //     // 通过plugin-transform-runtime编译后的代码会创造沙箱垫片，代码服用，避免重复插入
+        //     // 不会污染全局，一般用在库开发 或 不确定代码运行环境 的情况
+        //     // 注意：不建议与preset-env一起使用，如果需要在库中开发，则取消注释
+        //     // "@babel/plugin-transform-runtime", {
+        //     //     "corejs": 3,
+        //     // }
+        // ]
     ]
 }
