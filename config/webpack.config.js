@@ -10,6 +10,27 @@ const postcssNormalize = require('postcss-normalize');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const safePostCssParser = require('postcss-safe-parser');
+const threadLoader = require('thread-loader');
+// 用来检测loader、plugin的耗时
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+
+const smp = new SpeedMeasurePlugin();
+
+// 处理js的loader 的thread-loader配置
+const jsWorkerPool = {
+    // 闲置时 2000ms 后删除进程
+    poolTimeout: 2000,
+};
+
+threadLoader.warmup(jsWorkerPool, ['babel-loader']);
+
+// 跑时间跑下来css相关loader耗时并不多，没必要用上，注释了
+// const cssWorkerPool = {
+//     // worker进程数
+//     workers: 2,
+//     poolTimeout: 2000,
+// }
+// threadLoader.warmup(cssWorkerPool, ['css-loader', 'postcss-loader', 'less-loader']);
 
 const isProdution = ['production', 'buildDebug'].includes(process.env.NODE_ENV);
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -61,7 +82,7 @@ const getStyleLoaders = (cssOption, otherProcessor) => {
     return loaders;
 }
 
-module.exports = {
+const webpackConfig = {
     mode: isProdution
         ? isBuildDebug
             ? 'development'
@@ -236,15 +257,21 @@ module.exports = {
                     {
                         test: /\.(js|ts)/,
                         exclude: /node_modules/,
-                        use: [{
-                            loader: require.resolve('babel-loader'),
-                            options: {
-                                // 开启编译缓存
-                                cacheDirectory: isBuildDebug ? false : true,
-                                // 是否压缩代码
-                                compact: isDevelopment,
+                        use: [
+                            {
+                                loader: require.resolve('thread-loader'),
+                                options: jsWorkerPool
+                            },
+                            {
+                                loader: require.resolve('babel-loader'),
+                                options: {
+                                    // 开启编译缓存
+                                    cacheDirectory: isBuildDebug ? false : true,
+                                    // 是否压缩代码
+                                    compact: isDevelopment,
+                                }
                             }
-                        }]
+                        ]
                     },
 
                     // 其他没有被匹配到的文件做兜底处理
@@ -299,3 +326,5 @@ module.exports = {
         maxAssetSize: 250000,
     }
 }
+
+module.exports = isBuildDebug ? smp.wrap(webpackConfig) : webpackConfig;
