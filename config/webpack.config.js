@@ -11,8 +11,10 @@ const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const safePostCssParser = require('postcss-safe-parser');
 const threadLoader = require('thread-loader');
+const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin');
 // 用来检测loader、plugin的耗时
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+const webpack = require('webpack');
 
 const smp = new SpeedMeasurePlugin();
 
@@ -148,6 +150,10 @@ const webpackConfig = {
                         ascii_only: true,
                     },
                 },
+                // 使用多线程
+                parallel: true,
+                // 使用缓存
+                cache: true,
                 sourceMap: shouldUseSourceMap,
             }),
             new OptimizeCSSAssetsPlugin({
@@ -218,7 +224,7 @@ const webpackConfig = {
         }
     },
     module: {
-        // 告诉webpack不必解析的内容，对于非模块化的库文件没必要进行解析，默认把jquery加上
+        // 告诉webpack不必解析的内容，对于非模块化的库文件没必要进行解析，默认加个jquery
         noParse: /jquery/,
         rules: [
             // isDevelopment ? {
@@ -313,6 +319,18 @@ const webpackConfig = {
                 }
             } : undefined)
         ),
+        new AddAssetHtmlWebpackPlugin({
+            filepath: path.resolve(paths.appDll, '*.dll.js'),
+            publicPath: paths.publicPath + 'static/js/',
+            outputPath: path.resolve(paths.appBuild, '/static/js'),
+            includeSourcemap: false,
+            hash: true
+        }),
+        new webpack.DllReferencePlugin({
+            // 要保证和DllPlugin的context相等
+            context: __dirname,
+            manifest: path.resolve(paths.appDll, 'venders.manifest.json')
+        }),
         new CleanWebpackPlugin()
     ].filter(Boolean),
     // 性能提示，当bundle过大时给出信息

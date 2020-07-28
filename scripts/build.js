@@ -1,5 +1,7 @@
 'use strict';
 
+const startTime = new Date();
+
 process.env.NODE_ENV = 'production';
 
 // 抛出没有捕捉到的错误
@@ -66,8 +68,10 @@ new Promise((resolve) => {
             console.log();
             console.log(chalk.bgYellow('构建出现警告.\n'));
         } else {
-            console.log(chalk.green('构建完成.\n'));
+            console.log(chalk.bgGreen(chalk.black('构建完成.\n')));
         }
+
+        console.log(chalk.blue(`构建耗时: ${new Date() - startTime}ms\n`));
 
         console.log(chalk.green('构建结果:\n'));
 

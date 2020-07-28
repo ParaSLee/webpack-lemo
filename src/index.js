@@ -2,10 +2,14 @@
 
 // console.log(add(1,2));
 
-import('./index2').then((res) => {
-    console.log(res);
-})
+import _ from 'lodash';
 
-import('./index3').then((res) => {
-    console.log(res);
-})
+// import('./index2').then((res) => {
+//     console.log(res);
+// })
+
+// import('./index3').then((res) => {
+//     console.log(res);
+// })
+console.log(1);
+console.log(_.isEmpty({}));

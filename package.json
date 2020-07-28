@@ -9,6 +9,7 @@
     "dev": "node scripts/dev.js",
     "build": "node scripts/build.js",
     "build:debug": "node scripts/build-debug.js",
+    "build:dll": "rm -rf dll/*; webpack --config ./config/webpack.dll.js",
     "dev2": "set NODE_ENV=development && webpack-dev-server --config ./config/webpack.config.js",
     "build2": "set NODE_ENV=production && webpack --config ./config/webpack.config.js"
   },
@@ -18,6 +19,7 @@
     "@babel/preset-env": "^7.10.4",
     "@babel/runtime": "^7.10.5",
     "@babel/runtime-corejs3": "^7.10.5",
+    "add-asset-html-webpack-plugin": "^3.1.3",
     "address": "^1.1.2",
     "babel-loader": "^8.1.0",
     "browserslist": "^4.12.2",
