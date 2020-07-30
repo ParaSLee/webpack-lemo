@@ -254,6 +254,18 @@ const webpackConfig = {
                     },
                     {
                         test: /\.less/,
+                        // 自定义loader需要在react中使用
+                        // use: getStyleLoaders({
+                        //     importLoaders: 2,
+                        //     sourceMap: shouldUseSourceMap
+                        // }, [{
+                        //     loader: 'less-loader',
+                        //     options: {
+                        //         sourceMap: shouldUseSourceMap
+                        //     }
+                        // }, {
+                        //     loader: path.resolve(__dirname, 'namespace.loader.js');
+                        // }]),
                         use: getStyleLoaders({
                             importLoaders: 2,
                             sourceMap: shouldUseSourceMap
@@ -276,7 +288,11 @@ const webpackConfig = {
                                     // 是否压缩代码
                                     compact: isDevelopment,
                                 }
-                            }
+                            },
+                            // 这个自定义loader用在react里面
+                            // {
+                            //     loader: path.resolve(__dirname, 'namespace.loader.js')
+                            // }
                         ]
                     },
 

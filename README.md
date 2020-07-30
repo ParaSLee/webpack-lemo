@@ -44,7 +44,7 @@
 |----- ✅ 打包速度分析：speed-measure-webpack-plugin <br>
 |----- ⬜ 打包体积分析 <br>
 |--- ✅ 增加dllplugin配置<br>
-|--- ⬜ 自定义loader：处理模块文件名<br>
+|--- ✅ 自定义loader：处理模块文件名<br>
 
 
 
